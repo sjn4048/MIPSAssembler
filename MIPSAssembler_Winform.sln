@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2043
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MIPSAssembler_Winform", "MIPSAssembler_Winform.csproj", "{9B89211B-A7D2-494D-964F-5B3E0F882155}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9B89211B-A7D2-494D-964F-5B3E0F882155}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B89211B-A7D2-494D-964F-5B3E0F882155}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B89211B-A7D2-494D-964F-5B3E0F882155}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B89211B-A7D2-494D-964F-5B3E0F882155}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C6BFD9AF-FADC-4785-B44A-BB57B007017B}
+	EndGlobalSection
+EndGlobal
