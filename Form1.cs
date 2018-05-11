@@ -15,12 +15,14 @@ namespace MIPSAssembler_Winform
     {
         string CurrentFileName = HAVENT_OPEN;
         const string HAVENT_OPEN = "This_indicates_nothing_is_open";
+        string outputPath;
         bool saved = true;
 
         public Form1()
         {
             InitializeComponent();
             linenum.Text = "1";
+            outputPath = Environment.CurrentDirectory;
         }
 
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -40,11 +42,10 @@ namespace MIPSAssembler_Winform
                 }
                 linenum.Text = linenum_text;
             }
-            toolStrip_Save.Enabled = CurrentFileName != HAVENT_OPEN;
-
+            ChangeTitle();
             /// 以下为着色
             #region paint
-            editor.Select();
+            int currentLine; // TODO
             #endregion
         }
 
@@ -62,7 +63,7 @@ namespace MIPSAssembler_Winform
                 editor.Text = File.ReadAllText(CurrentFileName);
                 toolStrip_Save.Enabled = false;
                 saved = true;
-                this.Text = $"MyMIPS - {CurrentFileName}";
+                ChangeTitle();
                 //return true;
             }
             //return false;
@@ -75,8 +76,12 @@ namespace MIPSAssembler_Winform
                 File.WriteAllText(CurrentFileName, editor.Text);
                 toolStrip_Save.Enabled = false;
                 saved = true;
-                this.Text = $"MyMIPS - {CurrentFileName}";
+                ChangeTitle();
                 //return true;
+            }
+            else
+            {
+                toolStrip_Saveelse.PerformClick();
             }
             //return false;
         }
@@ -91,7 +96,6 @@ namespace MIPSAssembler_Winform
             {
                 CurrentFileName = sfdialog.FileName;
                 File.WriteAllText(CurrentFileName, editor.Text);
-                this.Text = $"MyMIPS - {CurrentFileName}";
                 saved = true;
                 //return true;
             }
@@ -130,7 +134,7 @@ namespace MIPSAssembler_Winform
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            CheckSave();
+            CheckSave(e);
         }
 
         private void CheckSave() // 可以正确退出返回true，需要中止操作返回false
@@ -144,6 +148,19 @@ namespace MIPSAssembler_Winform
             }
         }
 
+        private void CheckSave(FormClosingEventArgs e) // 可以正确退出返回true，需要中止操作返回false
+        {
+            if (saved == false && MessageBox.Show(text: "有未保存的内容，确认离开？", caption: "提示", icon: MessageBoxIcon.Warning, buttons: MessageBoxButtons.YesNo) == DialogResult.No)
+            {
+                e.Cancel = true;
+                if (CurrentFileName == HAVENT_OPEN)
+                    toolStrip_Saveelse.PerformClick();
+                else
+                    toolStrip_Save.PerformClick();
+            }
+        }
+
+
         private void toolStrip_Exit_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -151,7 +168,93 @@ namespace MIPSAssembler_Winform
 
         private void toolStrip_About_Click(object sender, EventArgs e)
         {
+            new Form_About().ShowDialog();
+        }
 
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ChangeTitle()
+        {
+            if (this.CurrentFileName != HAVENT_OPEN)
+            {
+                if (this.saved)
+                    this.Text = this.Text = $"MyMIPS - {CurrentFileName}";
+                else
+                    this.Text = this.Text = $"MyMIPS - {CurrentFileName} *";
+            }
+            else
+            {
+                this.Text = this.Text = $"MyMIPS - 未保存文件";
+            }
+        }
+
+        private void CodeColoring(int currentLine) // 标注指定行
+        {
+            string line = editor.Lines[currentLine];
+            {
+                // 着色注释
+                int index = line.IndexOf('#');
+                if (index != -1)
+                    editor.Select();
+            }
+        }
+
+        private void CodeColoring(int startLine, int endLine) // 注释指定范围行
+        {
+            for (int i = startLine; i < endLine; i++)
+            {
+                CodeColoring(i);
+            }
+        }
+
+        private void toolStrip_binary_Click(object sender, EventArgs e)
+        {
+            var assembler = new MIPSAssembler();
+            var result = assembler.MipsToBin(editor.Text);
+
+            var sfdialog = new SaveFileDialog()
+            {
+                Title = "保存.bin文件",
+                Filter = "bin文件|*.bin|所有文件|*.*"
+            };
+            if (sfdialog.ShowDialog() == DialogResult.OK)
+            {
+                outputPath = Path.GetDirectoryName(sfdialog.FileName);
+                CurrentFileName = sfdialog.FileName;
+                File.WriteAllText(CurrentFileName, result);
+            }
+        }
+
+        private void toolStrip_Coe_Click(object sender, EventArgs e)
+        {
+            var assembler = new MIPSAssembler();
+            var result = assembler.MipsToCoe(editor.Text);
+
+            var sfdialog = new SaveFileDialog()
+            {
+                Title = "保存.coe文件",
+                Filter = "coe文件|*.coe|所有文件|*.*"
+            };
+            if (sfdialog.ShowDialog() == DialogResult.OK)
+            {
+                outputPath = Path.GetDirectoryName(sfdialog.FileName);
+                CurrentFileName = sfdialog.FileName;
+                File.WriteAllText(CurrentFileName, result);
+            }
+        }
+
+        private void toolStrip_OpenDir_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(outputPath);
+        }
+
+        private void toolStrip_All_Click(object sender, EventArgs e)
+        {
+            toolStrip_binary.PerformClick();
+            toolStrip_Coe.PerformClick();
         }
     }
 }
