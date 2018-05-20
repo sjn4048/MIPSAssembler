@@ -61,6 +61,7 @@
       <DependentUpon>Form_About.cs</DependentUpon>
     </Compile>
     <Compile Include="MIPSAssembler.cs" />
+    <Compile Include="MIPSDisassmbler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

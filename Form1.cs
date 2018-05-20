@@ -55,7 +55,7 @@ namespace MIPSAssembler_Winform
             var ofDialog = new OpenFileDialog()
             {
                 // InitialDirectory = "",
-                Filter = "所有文件|*.*|coe文件|*.coe|bin文件|*.bin"
+                Filter = "所有文件|*.*|coe文件|*.coe|bin文件|*.bin|汇编文件(*.a,*.asm)|*.a;*.asm"
             };
             if (ofDialog.ShowDialog() == DialogResult.OK)
             {
@@ -90,7 +90,7 @@ namespace MIPSAssembler_Winform
         {
             var sfdialog = new SaveFileDialog()
             {
-                Filter = "所有文件|*.*|coe文件|*.coe|bin文件|*.bin"
+                Filter = "所有文件|*.*|coe文件|*.coe|bin文件|*.bin|汇编文件(*.a,*.asm)|*.a;*.asm"
             };
             if (sfdialog.ShowDialog() == DialogResult.OK)
             {
@@ -255,6 +255,33 @@ namespace MIPSAssembler_Winform
         {
             toolStrip_binary.PerformClick();
             toolStrip_Coe.PerformClick();
+        }
+
+        private void toolStrip_new_Click(object sender, EventArgs e)
+        {
+            CheckSave();
+            CurrentFileName = HAVENT_OPEN;
+            saved = true;
+            outputPath = "";
+            editor.Clear();
+            ChangeTitle();
+        }
+
+        private void toolStrip_Disassemble_Click(object sender, EventArgs e)
+        {
+            CheckSave();
+            if (CurrentFileName.ToLower().EndsWith(".coe"))
+                editor.Text = new MIPSDisassembler().CoeToMips(editor.Text);
+            else if (CurrentFileName.ToLower().EndsWith(".bin"))
+                editor.Text = new MIPSDisassembler().BinToMips(editor.Text);
+            else if (MessageBox.Show(text:@"请选择当前文件类型(coe请按""是""/bin请按""否"")", buttons:MessageBoxButtons.YesNo, caption:"请选择文件类型", icon:MessageBoxIcon.Asterisk) == DialogResult.Yes)
+            {
+                editor.Text = new MIPSDisassembler().CoeToMips(editor.Text);
+            }
+            else
+            {
+                editor.Text = new MIPSDisassembler().BinToMips(editor.Text);
+            }
         }
     }
 }
