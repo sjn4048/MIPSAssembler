@@ -98,6 +98,7 @@ namespace MIPSAssembler_Winform
         private void editor_TextChanged(object sender, EventArgs e)
         {
             saved = false;
+            toolStrip_Save.Enabled = true;
             if (editor.Lines.Length != currentLineNum)
             {
                 currentLineNum = editor.Lines.Length;
@@ -147,7 +148,7 @@ namespace MIPSAssembler_Winform
         {
             var sfdialog = new SaveFileDialog()
             {
-                Filter = "所有文件|*.*|coe文件|*.coe|bin文件|*.bin|汇编文件(*.a,*.asm)|*.a;*.asm"
+                Filter = "所有文件|*.*|coe文件|*.coe|bin文件|*.bin|汇编文件(*.a,*.asm)|*.a;*.asm",
             };
             if (sfdialog.ShowDialog() == DialogResult.OK)
             {
@@ -297,13 +298,13 @@ namespace MIPSAssembler_Winform
                     CurrentFileName = sfdialog.FileName;
                     toolStrip_new.PerformClick();
                     File.WriteAllText(CurrentFileName, result);
+                    consoleTextbox.Text += "bin文件输出成功。按F8打开输出目录。\n";
                 }
                 catch (Exception ex)
                 {
                     consoleTextbox.Text += ex.Message + '\n';
                 }
             }
-            consoleTextbox.Text += "bin文件输出成功。按F8打开输出目录。\n";
         }
 
         private void toolStrip_Coe_Click(object sender, EventArgs e)
@@ -315,20 +316,20 @@ namespace MIPSAssembler_Winform
             };
             if (sfdialog.ShowDialog() == DialogResult.OK)
             {
-                try
+                //try
                 {
                     var assembler = new MIPSAssembler();
                     var result = assembler.MipsToCoe(editor.Text);
                     outputPath = Path.GetDirectoryName(sfdialog.FileName);
                     CurrentFileName = sfdialog.FileName;
                     File.WriteAllText(CurrentFileName, result);
+                    consoleTextbox.Text += "coe文件输出成功。按F8打开输出目录。\n";
                 }
-                catch (Exception ex)
+                //catch (Exception ex)
                 {
-                    consoleTextbox.Text += ex.Message + '\n';
+                    //consoleTextbox.Text += ex.Message + '\n';
                 }
             }
-            consoleTextbox.Text += "coe文件输出成功。按F8打开输出目录。\n";
         }
 
         private void toolStrip_OpenDir_Click(object sender, EventArgs e)

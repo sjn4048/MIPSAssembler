@@ -16,10 +16,12 @@ namespace MIPSAssembler_Winform
         private static readonly char[] delimitter = { ' ', '\t', ',', '\n', ';', '(', ')' };
         public uint CurrentAddress { get; private set; }
         public Dictionary<string, uint> Labels { get; private set; }
+        public Dictionary<string, int> Variables { get; private set; }
         private static Dictionary<string, uint> PseudoIns_To_RealIns_Num = new Dictionary<string, uint>()
         {
             { "la", 2 },
             { "li", 2 },
+            { "EQU",0 },
         };
 
         public MIPSAssembler()
@@ -34,6 +36,7 @@ namespace MIPSAssembler_Winform
             var instructions = MipsCode.Split('\n'); // 分割指令
             // 第一次扫描
             Labels = new Dictionary<string, uint>();
+            Variables = new Dictionary<string, int>();
             CurrentAddress = 0;
             string result = "";
             foreach (string instruction in instructions)
@@ -49,11 +52,26 @@ namespace MIPSAssembler_Winform
                 if (instruction.StartsWith("BaseAddre:"))
                 {
                     uint base_addr = Convert.ToUInt32(instruction.Substring(10, instruction.Length - 10), 16);
+                    if (CurrentAddress > base_addr)
+                        throw new Exception("BaseAddre Incorrect.");
                     for (; CurrentAddress < base_addr; CurrentAddress++)
                     {
                         result += "00000000";
                     }
                     CurrentAddress = base_addr;
+                    continue;
+                }
+                if (instruction.StartsWith("DataAddre:"))
+                {
+                    uint data_addr = Convert.ToUInt32(instruction.Substring(10, instruction.Length - 10), 16);
+                    if (CurrentAddress > data_addr)
+                        throw new Exception("BaseAddre Incorrect.");
+
+                    for (; CurrentAddress < data_addr; CurrentAddress++)
+                    {
+                        result += "00000000";
+                    }
+                    CurrentAddress = data_addr;
                     continue;
                 }
                 if (instruction.StartsWith("#") || instruction.StartsWith("//") || field.Length == 0) // 注释
@@ -78,6 +96,7 @@ namespace MIPSAssembler_Winform
             var instructions = MipsCode.Split('\n'); // 分割指令
             // 第一次扫描
             Labels = new Dictionary<string, uint>();
+            Variables = new Dictionary<string, int>();
             CurrentAddress = 0;
             string result = "";
             foreach (string instruction in instructions)
@@ -94,12 +113,27 @@ namespace MIPSAssembler_Winform
                     continue;
                 if (instruction.StartsWith("BaseAddre:"))
                 {
-                    uint base_addr = Convert.ToUInt32(instruction.Substring(10, instruction.Length - 10), 16);
+                    uint base_addr = Convert.ToUInt32(instruction.Substring(10, instruction.Length - 10).Trim(), 16);
+                    if (CurrentAddress > base_addr)
+                        throw new Exception("BaseAddre Incorrect.");
                     for (; CurrentAddress < base_addr; CurrentAddress++)
                     {
                         result += "00000000";
                     }
                     CurrentAddress = base_addr;
+                    continue;
+                }
+                if (instruction.StartsWith("DataAddre:"))
+                {
+                    uint data_addr = Convert.ToUInt32(instruction.Substring(10, instruction.Length - 10).Trim(), 16);
+                    if (CurrentAddress > data_addr)
+                        throw new Exception("BaseAddre Incorrect.");
+
+                    for (; CurrentAddress < data_addr; CurrentAddress++)
+                    {
+                        result += "00000000";
+                    }
+                    CurrentAddress = data_addr;
                     continue;
                 }
                 if (instruction.Contains(':')) // 编码
@@ -112,7 +146,7 @@ namespace MIPSAssembler_Winform
             result = result + ';';
             for (int i = 100; i < result.Length; i += 101)
                 result = result.Insert(i, "\n");
-            
+
             return header + result;
         }
 
@@ -124,7 +158,7 @@ namespace MIPSAssembler_Winform
                 CurrentAddress += PseudoIns_To_RealIns_Num[op]; // 非长久之计
             else
                 CurrentAddress++;
-            switch (op)
+            switch (op.ToLower())
             {
                 case "add":
                     byte_res = generate_add(instruction);
@@ -292,7 +326,21 @@ namespace MIPSAssembler_Winform
                 case "move":
                     byte_res = generate_move(instruction);
                     break;
+                case "db":
+                    byte_res = generate_db(instruction);
+                    break;
+                case "dw":
+                    byte_res = generate_dw(instruction);
+                    break;
+                case "dd":
+                    byte_res = generate_dd(instruction);
+                    break;
                 default:
+                    if (instruction.Split()[1].ToLower() == "equ")
+                    {
+                        byte_res = generate_equ(instruction);
+                        break;
+                    }
                     CurrentAddress--;
                     throw new Exception($"无法解析的指令: {op}");
             }
@@ -305,11 +353,22 @@ namespace MIPSAssembler_Winform
             string[] field = input.Split(delimitter, StringSplitOptions.RemoveEmptyEntries);
             if (input.StartsWith("#") || input.StartsWith("//") || field.Length == 0) // 注释
                 return;
-            
+
             if (input.StartsWith("BaseAddre:"))
             {
-                uint base_addr = Convert.ToUInt32(input.Substring(10, input.Length - 10), 16);
-                CurrentAddress = base_addr;
+                uint base_addr = Convert.ToUInt32(input.Substring(10, input.Length - 10).Trim(), 16);
+                if (CurrentAddress <= base_addr)
+                    CurrentAddress = base_addr;
+                else
+                    throw new Exception("BaseAddre Incorrect.");
+            }
+            if (input.StartsWith("DataAddre:"))
+            {
+                uint data_addr = Convert.ToUInt32(input.Substring(10, input.Length - 10).Trim(), 16);
+                if (CurrentAddress <= data_addr)
+                    CurrentAddress = data_addr;
+                else
+                    throw new Exception("DataAddre Incorrect.");
             }
             else if (input.Contains(':')) // 编码
             {
@@ -1483,13 +1542,12 @@ namespace MIPSAssembler_Winform
             return intBytes;
         }
 
-        private byte[] generate_syscall(string input) // 似乎存疑
+        private byte[] generate_syscall(string input)
         {
-            StringBuilder ret_string = new StringBuilder();
-            ret_string.Append('0' * 26 + "001100");
+            string ret_string = "00000000000000000000000000001100";
 
             // 以下转化为byte[]
-            byte[] intBytes = BitConverter.GetBytes(Convert.ToInt32(ret_string.ToString(), 2));
+            byte[] intBytes = BitConverter.GetBytes(Convert.ToInt32(ret_string, 2));
             if (BitConverter.IsLittleEndian) Array.Reverse(intBytes);
             return intBytes;
         }
@@ -1551,6 +1609,52 @@ namespace MIPSAssembler_Winform
             intBytes.Concat(generate_ori($"lui {field[1]}, {field[1]}, {lower16}")).ToArray();
 
             return intBytes;
+        }
+
+        private byte[] generate_db(string input) // 伪指令
+        {
+            var field = input.Split(delimitter, StringSplitOptions.RemoveEmptyEntries);
+            byte[] intBytes = { };
+            for (int i = 1; i < field.Length; i++)
+            {
+                var tmpBytes = BitConverter.GetBytes(Convert.ToInt16(field[i], 16)).Take(1);
+                intBytes = intBytes.Concat(tmpBytes).ToArray();
+            }
+            if (BitConverter.IsLittleEndian) Array.Reverse(intBytes);
+            return intBytes;
+        }
+
+        private byte[] generate_dw(string input) // 伪指令
+        {
+            var field = input.Split(delimitter, StringSplitOptions.RemoveEmptyEntries);
+            byte[] intBytes = { };
+            for (int i = 1; i < field.Length; i++)
+            {
+                var tmpBytes = BitConverter.GetBytes(Convert.ToInt16(field[i], 16)).Take(2);
+                intBytes = intBytes.Concat(tmpBytes).ToArray();
+            }
+            if (BitConverter.IsLittleEndian) Array.Reverse(intBytes);
+            return intBytes;
+        }
+
+        private byte[] generate_dd(string input) // 伪指令
+        {
+            var field = input.Split(delimitter, StringSplitOptions.RemoveEmptyEntries);
+            byte[] intBytes = { };
+            for (int i = 1; i < field.Length; i++)
+            {
+                var tmpBytes = BitConverter.GetBytes(Convert.ToInt32(field[i], 16)).Take(4);
+                intBytes = intBytes.Concat(tmpBytes).ToArray();
+            }
+            if (BitConverter.IsLittleEndian) Array.Reverse(intBytes);
+            return intBytes;
+        }
+
+        private byte[] generate_equ(string input) // 伪指令
+        {
+            var field = input.Split(delimitter, StringSplitOptions.RemoveEmptyEntries);
+            Variables.Add(field[0], int.Parse(field[2]));
+            return new byte[] { };
         }
         #endregion
     }
