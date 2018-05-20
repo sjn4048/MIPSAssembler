@@ -31,6 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.文件FToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrip_new = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip_Open = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip_Save = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip_Saveelse = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,13 +52,14 @@
             this.toolStrip_All = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
             this.打开输出目录ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.帮助HToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStrip_About = new System.Windows.Forms.ToolStripMenuItem();
-            this.editor = new System.Windows.Forms.RichTextBox();
-            this.linenum = new System.Windows.Forms.RichTextBox();
-            this.toolStrip_new = new System.Windows.Forms.ToolStripMenuItem();
             this.反汇编DToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip_Disassemble = new System.Windows.Forms.ToolStripMenuItem();
+            this.debugDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.帮助HToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrip_About = new System.Windows.Forms.ToolStripMenuItem();
+            this.consoleTextbox = new System.Windows.Forms.RichTextBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.editor = new System.Windows.Forms.RichTextBox();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -69,8 +71,8 @@
             this.文件FToolStripMenuItem,
             this.编辑EToolStripMenuItem,
             this.汇编AToolStripMenuItem,
-            this.帮助HToolStripMenuItem,
-            this.反汇编DToolStripMenuItem});
+            this.反汇编DToolStripMenuItem,
+            this.帮助HToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(800, 25);
@@ -90,6 +92,14 @@
             this.文件FToolStripMenuItem.Name = "文件FToolStripMenuItem";
             this.文件FToolStripMenuItem.Size = new System.Drawing.Size(58, 21);
             this.文件FToolStripMenuItem.Text = "文件(&F)";
+            // 
+            // toolStrip_new
+            // 
+            this.toolStrip_new.Name = "toolStrip_new";
+            this.toolStrip_new.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
+            this.toolStrip_new.Size = new System.Drawing.Size(206, 22);
+            this.toolStrip_new.Text = "新建(N)";
+            this.toolStrip_new.Click += new System.EventHandler(this.toolStrip_new_Click);
             // 
             // toolStrip_Open
             // 
@@ -148,7 +158,7 @@
             // 
             this.toolStrip_Add.Name = "toolStrip_Add";
             this.toolStrip_Add.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.toolStrip_Add.Size = new System.Drawing.Size(180, 22);
+            this.toolStrip_Add.Size = new System.Drawing.Size(161, 22);
             this.toolStrip_Add.Text = "复制(&C)";
             this.toolStrip_Add.Click += new System.EventHandler(this.toolStrip_Add_Click);
             // 
@@ -156,7 +166,7 @@
             // 
             this.toolStrip_Cut.Name = "toolStrip_Cut";
             this.toolStrip_Cut.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-            this.toolStrip_Cut.Size = new System.Drawing.Size(180, 22);
+            this.toolStrip_Cut.Size = new System.Drawing.Size(161, 22);
             this.toolStrip_Cut.Text = "剪切(&X)";
             this.toolStrip_Cut.Click += new System.EventHandler(this.toolStrip_Cut_Click);
             // 
@@ -164,20 +174,20 @@
             // 
             this.toolStrip_Paste.Name = "toolStrip_Paste";
             this.toolStrip_Paste.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-            this.toolStrip_Paste.Size = new System.Drawing.Size(180, 22);
+            this.toolStrip_Paste.Size = new System.Drawing.Size(161, 22);
             this.toolStrip_Paste.Text = "粘贴(&V)";
             this.toolStrip_Paste.Click += new System.EventHandler(this.toolStrip_Paste_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(158, 6);
             // 
             // toolStrip_Undo
             // 
             this.toolStrip_Undo.Name = "toolStrip_Undo";
             this.toolStrip_Undo.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
-            this.toolStrip_Undo.Size = new System.Drawing.Size(180, 22);
+            this.toolStrip_Undo.Size = new System.Drawing.Size(161, 22);
             this.toolStrip_Undo.Text = "撤销(&Z)";
             this.toolStrip_Undo.Click += new System.EventHandler(this.toolStrip_Undo_Click);
             // 
@@ -185,20 +195,20 @@
             // 
             this.toolStrip_Redo.Name = "toolStrip_Redo";
             this.toolStrip_Redo.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
-            this.toolStrip_Redo.Size = new System.Drawing.Size(180, 22);
+            this.toolStrip_Redo.Size = new System.Drawing.Size(161, 22);
             this.toolStrip_Redo.Text = "重做(&Y)";
             this.toolStrip_Redo.Click += new System.EventHandler(this.toolStrip_Redo_Click);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(158, 6);
             // 
             // toolStrip_SelectAll
             // 
             this.toolStrip_SelectAll.Name = "toolStrip_SelectAll";
             this.toolStrip_SelectAll.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.toolStrip_SelectAll.Size = new System.Drawing.Size(180, 22);
+            this.toolStrip_SelectAll.Size = new System.Drawing.Size(161, 22);
             this.toolStrip_SelectAll.Text = "全选(&A)";
             this.toolStrip_SelectAll.Click += new System.EventHandler(this.toolStrip_SelectAll_Click);
             // 
@@ -251,6 +261,29 @@
             this.打开输出目录ToolStripMenuItem.Text = "打开输出目录(O)";
             this.打开输出目录ToolStripMenuItem.Click += new System.EventHandler(this.toolStrip_OpenDir_Click);
             // 
+            // 反汇编DToolStripMenuItem
+            // 
+            this.反汇编DToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStrip_Disassemble,
+            this.debugDToolStripMenuItem});
+            this.反汇编DToolStripMenuItem.Name = "反汇编DToolStripMenuItem";
+            this.反汇编DToolStripMenuItem.Size = new System.Drawing.Size(73, 21);
+            this.反汇编DToolStripMenuItem.Text = "反汇编(D)";
+            // 
+            // toolStrip_Disassemble
+            // 
+            this.toolStrip_Disassemble.Name = "toolStrip_Disassemble";
+            this.toolStrip_Disassemble.Size = new System.Drawing.Size(132, 22);
+            this.toolStrip_Disassemble.Text = "反汇编(&R)";
+            this.toolStrip_Disassemble.Click += new System.EventHandler(this.toolStrip_Disassemble_Click);
+            // 
+            // debugDToolStripMenuItem
+            // 
+            this.debugDToolStripMenuItem.Name = "debugDToolStripMenuItem";
+            this.debugDToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.debugDToolStripMenuItem.Text = "Debug(&D)";
+            this.debugDToolStripMenuItem.Click += new System.EventHandler(this.debugDToolStripMenuItem_Click);
+            // 
             // 帮助HToolStripMenuItem
             // 
             this.帮助HToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -263,65 +296,56 @@
             // 
             this.toolStrip_About.Name = "toolStrip_About";
             this.toolStrip_About.ShortcutKeys = System.Windows.Forms.Keys.F1;
-            this.toolStrip_About.Size = new System.Drawing.Size(180, 22);
+            this.toolStrip_About.Size = new System.Drawing.Size(137, 22);
             this.toolStrip_About.Text = "关于(&A)";
             this.toolStrip_About.Click += new System.EventHandler(this.toolStrip_About_Click);
             // 
+            // consoleTextbox
+            // 
+            this.consoleTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.consoleTextbox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.consoleTextbox.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.consoleTextbox.ForeColor = System.Drawing.Color.SeaGreen;
+            this.consoleTextbox.Location = new System.Drawing.Point(5, 452);
+            this.consoleTextbox.Name = "consoleTextbox";
+            this.consoleTextbox.Size = new System.Drawing.Size(788, 190);
+            this.consoleTextbox.TabIndex = 3;
+            this.consoleTextbox.Text = "Console\n";
+            this.consoleTextbox.TextChanged += new System.EventHandler(this.consoleTextbox_TextChanged);
+            // 
+            // panel1
+            // 
+            this.panel1.Location = new System.Drawing.Point(8, 28);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(32, 423);
+            this.panel1.TabIndex = 4;
+            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
+            // 
             // editor
             // 
+            this.editor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.editor.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.editor.Cursor = System.Windows.Forms.Cursors.No;
-            this.editor.Font = new System.Drawing.Font("Consolas", 12F);
-            this.editor.Location = new System.Drawing.Point(26, 26);
+            this.editor.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.editor.Location = new System.Drawing.Point(40, 27);
             this.editor.Name = "editor";
-            this.editor.Size = new System.Drawing.Size(768, 422);
-            this.editor.TabIndex = 1;
+            this.editor.Size = new System.Drawing.Size(760, 424);
+            this.editor.TabIndex = 0;
             this.editor.Text = "";
+            this.editor.VScroll += new System.EventHandler(this.editor_VScroll);
             this.editor.TextChanged += new System.EventHandler(this.editor_TextChanged);
-            // 
-            // linenum
-            // 
-            this.linenum.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.linenum.Cursor = System.Windows.Forms.Cursors.No;
-            this.linenum.Font = new System.Drawing.Font("Consolas", 12F);
-            this.linenum.ForeColor = System.Drawing.Color.DodgerBlue;
-            this.linenum.Location = new System.Drawing.Point(2, 26);
-            this.linenum.Name = "linenum";
-            this.linenum.Size = new System.Drawing.Size(23, 423);
-            this.linenum.TabIndex = 2;
-            this.linenum.Text = "";
-            // 
-            // toolStrip_new
-            // 
-            this.toolStrip_new.Name = "toolStrip_new";
-            this.toolStrip_new.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.toolStrip_new.Size = new System.Drawing.Size(206, 22);
-            this.toolStrip_new.Text = "新建(N)";
-            this.toolStrip_new.Click += new System.EventHandler(this.toolStrip_new_Click);
-            // 
-            // 反汇编DToolStripMenuItem
-            // 
-            this.反汇编DToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStrip_Disassemble});
-            this.反汇编DToolStripMenuItem.Name = "反汇编DToolStripMenuItem";
-            this.反汇编DToolStripMenuItem.Size = new System.Drawing.Size(73, 21);
-            this.反汇编DToolStripMenuItem.Text = "反汇编(D)";
-            // 
-            // toolStrip_Disassemble
-            // 
-            this.toolStrip_Disassemble.Name = "toolStrip_Disassemble";
-            this.toolStrip_Disassemble.Size = new System.Drawing.Size(180, 22);
-            this.toolStrip_Disassemble.Text = "反汇编(&D)";
-            this.toolStrip_Disassemble.Click += new System.EventHandler(this.toolStrip_Disassemble_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.linenum);
+            this.ClientSize = new System.Drawing.Size(800, 654);
             this.Controls.Add(this.editor);
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.consoleTextbox);
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
@@ -349,8 +373,6 @@
         private System.Windows.Forms.ToolStripMenuItem toolStrip_Exit;
         private System.Windows.Forms.ToolStripMenuItem toolStrip_Add;
         private System.Windows.Forms.ToolStripMenuItem toolStrip_About;
-        private System.Windows.Forms.RichTextBox editor;
-        private System.Windows.Forms.RichTextBox linenum;
         private System.Windows.Forms.ToolStripMenuItem toolStrip_Cut;
         private System.Windows.Forms.ToolStripMenuItem toolStrip_Paste;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
@@ -366,6 +388,10 @@
         private System.Windows.Forms.ToolStripMenuItem toolStrip_new;
         private System.Windows.Forms.ToolStripMenuItem 反汇编DToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolStrip_Disassemble;
+        private System.Windows.Forms.RichTextBox consoleTextbox;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.RichTextBox editor;
+        private System.Windows.Forms.ToolStripMenuItem debugDToolStripMenuItem;
     }
 }
 

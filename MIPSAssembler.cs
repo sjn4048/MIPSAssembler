@@ -14,9 +14,9 @@ namespace MIPSAssembler_Winform
         //FileStream oFile;
 
         private static readonly char[] delimitter = { ' ', '\t', ',', '\n', ';', '(', ')' };
-        public int CurrentAddress { get; private set; }
-        public Dictionary<string, int> Labels { get; private set; }
-        private static Dictionary<string, int> PseudoIns_To_RealIns_Num = new Dictionary<string, int>()
+        public uint CurrentAddress { get; private set; }
+        public Dictionary<string, uint> Labels { get; private set; }
+        private static Dictionary<string, uint> PseudoIns_To_RealIns_Num = new Dictionary<string, uint>()
         {
             { "la", 2 },
             { "li", 2 },
@@ -33,7 +33,7 @@ namespace MIPSAssembler_Winform
         {
             var instructions = MipsCode.Split('\n'); // 分割指令
             // 第一次扫描
-            Labels = new Dictionary<string, int>();
+            Labels = new Dictionary<string, uint>();
             CurrentAddress = 0;
             string result = "";
             foreach (string instruction in instructions)
@@ -46,6 +46,16 @@ namespace MIPSAssembler_Winform
             foreach (string instruction in instructions)
             {
                 string[] field = instruction.Split(delimitter, StringSplitOptions.RemoveEmptyEntries);
+                if (instruction.StartsWith("BaseAddre:"))
+                {
+                    uint base_addr = Convert.ToUInt32(instruction.Substring(10, instruction.Length - 10), 16);
+                    for (; CurrentAddress < base_addr; CurrentAddress++)
+                    {
+                        result += "00000000";
+                    }
+                    CurrentAddress = base_addr;
+                    continue;
+                }
                 if (instruction.StartsWith("#") || instruction.StartsWith("//") || field.Length == 0) // 注释
                     continue;
                 if (instruction.Contains(':')) // 编码
@@ -67,7 +77,7 @@ namespace MIPSAssembler_Winform
 
             var instructions = MipsCode.Split('\n'); // 分割指令
             // 第一次扫描
-            Labels = new Dictionary<string, int>();
+            Labels = new Dictionary<string, uint>();
             CurrentAddress = 0;
             string result = "";
             foreach (string instruction in instructions)
@@ -82,6 +92,16 @@ namespace MIPSAssembler_Winform
                 string[] field = instruction.Split(delimitter, StringSplitOptions.RemoveEmptyEntries);
                 if (instruction.StartsWith("#") || instruction.StartsWith("//") || field.Length == 0) // 注释
                     continue;
+                if (instruction.StartsWith("BaseAddre:"))
+                {
+                    uint base_addr = Convert.ToUInt32(instruction.Substring(10, instruction.Length - 10), 16);
+                    for (; CurrentAddress < base_addr; CurrentAddress++)
+                    {
+                        result += "00000000";
+                    }
+                    CurrentAddress = base_addr;
+                    continue;
+                }
                 if (instruction.Contains(':')) // 编码
                     continue;
                 var byte_res = AnalyzeInstruction(instruction, field[0]);
@@ -98,11 +118,12 @@ namespace MIPSAssembler_Winform
 
         public byte[] AnalyzeInstruction(string instruction, string op)
         {
+            byte[] byte_res;
+
             if (PseudoIns_To_RealIns_Num.ContainsKey(op))
                 CurrentAddress += PseudoIns_To_RealIns_Num[op]; // 非长久之计
             else
                 CurrentAddress++;
-            byte[] byte_res;
             switch (op)
             {
                 case "add":
@@ -284,7 +305,13 @@ namespace MIPSAssembler_Winform
             string[] field = input.Split(delimitter, StringSplitOptions.RemoveEmptyEntries);
             if (input.StartsWith("#") || input.StartsWith("//") || field.Length == 0) // 注释
                 return;
-            if (input.Contains(':')) // 编码
+            
+            if (input.StartsWith("BaseAddre:"))
+            {
+                uint base_addr = Convert.ToUInt32(input.Substring(10, input.Length - 10), 16);
+                CurrentAddress = base_addr;
+            }
+            else if (input.Contains(':')) // 编码
             {
                 string labelName = input.Split(':')[0];
                 if (input.Count(c => c == ':') > 1) // 多于一个:
@@ -881,8 +908,8 @@ namespace MIPSAssembler_Winform
             string op = "000100";
             int rs = Register.GetIndex(field[1]);
             int rt = Register.GetIndex(field[2]);
-            int immediate;
-            if (Int32.TryParse(field[3], out immediate) == false)
+            uint immediate;
+            if (UInt32.TryParse(field[3], out immediate) == false)
                 immediate = Labels[field[3]];
 
             Int16 offset = (Int16)(immediate - CurrentAddress); // 存疑
@@ -905,8 +932,8 @@ namespace MIPSAssembler_Winform
             string op = "000101";
             int rs = Register.GetIndex(field[1]);
             int rt = Register.GetIndex(field[2]);
-            int immediate;
-            if (Int32.TryParse(field[3], out immediate) == false)
+            uint immediate;
+            if (UInt32.TryParse(field[3], out immediate) == false)
                 immediate = Labels[field[3]];
 
             Int16 offset = (Int16)(immediate - CurrentAddress); // 存疑
@@ -929,8 +956,8 @@ namespace MIPSAssembler_Winform
             string op = "000110";
             int rs = Register.GetIndex(field[1]);
             int rt = 0;
-            int immediate;
-            if (Int32.TryParse(field[2], out immediate) == false)
+            uint immediate;
+            if (UInt32.TryParse(field[2], out immediate) == false)
                 immediate = Labels[field[2]];
 
             Int16 offset = (Int16)(immediate - CurrentAddress); // 存疑
@@ -953,8 +980,8 @@ namespace MIPSAssembler_Winform
             string op = "000111";
             int rs = Register.GetIndex(field[1]);
             int rt = 0;
-            int immediate;
-            if (Int32.TryParse(field[2], out immediate) == false)
+            uint immediate;
+            if (UInt32.TryParse(field[2], out immediate) == false)
                 immediate = Labels[field[2]];
 
             Int16 offset = (Int16)(immediate - CurrentAddress); // 存疑
@@ -977,8 +1004,8 @@ namespace MIPSAssembler_Winform
             string op = "000001";
             int rs = Register.GetIndex(field[1]);
             int rt = 0;
-            int immediate;
-            if (Int32.TryParse(field[2], out immediate) == false)
+            uint immediate;
+            if (UInt32.TryParse(field[2], out immediate) == false)
                 immediate = Labels[field[2]];
 
             Int16 offset = (Int16)(immediate - CurrentAddress); // 存疑
@@ -1001,8 +1028,8 @@ namespace MIPSAssembler_Winform
             string op = "000001";
             int rs = Register.GetIndex(field[1]);
             int rt = 1;
-            int immediate;
-            if (Int32.TryParse(field[2], out immediate) == false)
+            uint immediate;
+            if (UInt32.TryParse(field[2], out immediate) == false)
                 immediate = Labels[field[2]];
 
             Int16 offset = (Int16)(immediate - CurrentAddress); // 存疑
@@ -1025,8 +1052,8 @@ namespace MIPSAssembler_Winform
             var field = input.Split(delimitter, StringSplitOptions.RemoveEmptyEntries);
 
             string op = "000010";
-            int immediate;
-            if (Int32.TryParse(field[1], out immediate) == false)
+            uint immediate;
+            if (UInt32.TryParse(field[1], out immediate) == false)
                 immediate = Labels[field[1]];
 
             ret_string.Append(op);
@@ -1080,8 +1107,8 @@ namespace MIPSAssembler_Winform
             var field = input.Split(delimitter, StringSplitOptions.RemoveEmptyEntries);
 
             string op = "000011";
-            int immediate;
-            if (Int32.TryParse(field[1], out immediate) == false)
+            uint immediate;
+            if (UInt32.TryParse(field[1], out immediate) == false)
                 immediate = Labels[field[1]];
 
             ret_string.Append(op);
@@ -1499,7 +1526,7 @@ namespace MIPSAssembler_Winform
             StringBuilder ret_string = new StringBuilder();
             var field = input.Split(delimitter, StringSplitOptions.RemoveEmptyEntries);
 
-            if (Int32.TryParse(field[3], out Int32 address) == false)
+            if (UInt32.TryParse(field[3], out UInt32 address) == false)
                 address = Labels[field[2]];
             Int16 upper16 = (Int16)(address >> 16);
             Int16 lower16 = (Int16)(address);
@@ -1538,7 +1565,7 @@ namespace MIPSAssembler_Winform
         public int Index { get => index; set => index = value; }
         public int Value { get => value; set => this.value = value; }
 
-        static readonly string[] reg_names =
+        public static readonly string[] reg_names =
         {
             "$zero", "$at", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3", "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7", "$t8", "$t9", "$k0", "$k1", "$gp", "$sp", "$fp", "$ra"
         }; // 寄存器组的名字
